@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>入力内容のテキスト化</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+        .output {
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>入力内容をテキスト化</h1>
+
+        <div class="form-group">
+            <label for="kaimyo">戒名</label>
+            <input type="text" id="kaimyo" placeholder="戒名を入力">
+        </div>
+
+        <div class="form-group">
+            <label for="age">没年齢</label>
+            <input type="text" id="age" placeholder="没年齢を入力">
+        </div>
+
+        <div class="form-group">
+            <label for="date">没年月日</label>
+            <input type="date" id="date">
+        </div>
+
+        <div class="form-group">
+            <label for="zokumei">俗名</label>
+            <input type="text" id="zokumei" placeholder="俗名を入力">
+        </div>
+
+        <div class="form-group">
+            <button onclick="generateText()">テキストとして表示</button>
+        </div>
+
+        <div class="output" id="output">
+            <!-- 入力内容がここに表示されます -->
+        </div>
+    </div>
+
+    <script>
+        function generateText() {
+            // 入力された内容を取得
+            const kaimyo = document.getElementById('kaimyo').value;
+            const age = document.getElementById('age').value;
+            const date = document.getElementById('date').value;
+            const zokumei = document.getElementById('zokumei').value;
+
+            // 没年月日を「年」「月」「日」形式に変換
+            let formattedDate = "";
+            if (date) {
+                const dateObj = new Date(date);
+                const year = dateObj.getFullYear();
+                const month = dateObj.getMonth() + 1; // 月は0から始まるので+1
+                const day = dateObj.getDate();
+                formattedDate = `${year}年${month}月${day}日`;
+            }
+
+            // 出力用のテキストを作成
+            const outputText = `
+戒名: ${kaimyo}
+没年齢: ${age}
+没年月日: ${formattedDate}
+俗名: ${zokumei}
+            `;
+
+            // 出力エリアにテキストを表示
+            document.getElementById('output').textContent = outputText;
+        }
+    </script>
+
+</body>
+</html>
