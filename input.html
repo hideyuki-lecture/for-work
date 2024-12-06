@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>入力内容のテキスト化</title>
+    <title>入力内容をテキスト化</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,7 +30,9 @@
             font-weight: bold;
             margin-bottom: 5px;
         }
-        .form-group input {
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 8px;
             font-size: 16px;
@@ -64,24 +66,77 @@
     <div class="container">
         <h1>入力内容をテキスト化</h1>
 
+        <!-- 依頼内容 -->
         <div class="form-group">
-            <label for="kaimyo">戒名</label>
-            <input type="text" id="kaimyo" placeholder="戒名を入力">
+            <label for="request">依頼内容</label>
+            <select id="request">
+                <option value="納骨">納骨</option>
+                <option value="戒名彫刻">戒名彫刻</option>
+                <option value="リフォーム">リフォーム</option>
+                <option value="新規建墓">新規建墓</option>
+                <option value="その他">その他</option>
+            </select>
         </div>
 
+        <!-- 寺院名 -->
         <div class="form-group">
-            <label for="age">没年齢</label>
-            <input type="text" id="age" placeholder="没年齢を入力">
+            <label for="temple">寺院名</label>
+            <select id="temple">
+                <option value="浄心寺">浄心寺</option>
+                <option value="浩妙寺">浩妙寺</option>
+                <option value="長元寺">長元寺</option>
+                <option value="大林寺">大林寺</option>
+                <option value="真浄寺">真浄寺</option>
+                <option value="大円寺">大円寺</option>
+                <option value="大運寺">大運寺</option>
+                <option value="教元寺">教元寺</option>
+                <option value="長源寺">長源寺</option>
+                <option value="興善寺">興善寺</option>
+                <option value="妙福寺">妙福寺</option>
+                <option value="法恩寺">法恩寺</option>
+                <option value="顕本寺">顕本寺</option>
+            </select>
         </div>
 
+        <!-- 特記事項 -->
         <div class="form-group">
-            <label for="date">没年月日</label>
-            <input type="date" id="date">
+            <label for="remarks">特記事項</label>
+            <textarea id="remarks" rows="4" placeholder="特記事項を入力"></textarea>
         </div>
 
+        <!-- 期限 -->
         <div class="form-group">
-            <label for="zokumei">俗名</label>
-            <input type="text" id="zokumei" placeholder="俗名を入力">
+            <label for="deadline">期限</label>
+            <input type="date" id="deadline">
+        </div>
+
+        <hr>
+
+        <!-- 申込人情報 -->
+        <h2>申込人情報</h2>
+
+        <!-- 名前 -->
+        <div class="form-group">
+            <label for="name">名前</label>
+            <input type="text" id="name" placeholder="名前を入力">
+        </div>
+
+        <!-- 郵便番号 -->
+        <div class="form-group">
+            <label for="postal">郵便番号</label>
+            <input type="text" id="postal" placeholder="郵便番号を入力" onblur="fetchAddress()">
+        </div>
+
+        <!-- 住所 -->
+        <div class="form-group">
+            <label for="address">住所</label>
+            <textarea id="address" rows="4" placeholder="住所が自動入力されます" readonly></textarea>
+        </div>
+
+        <!-- 電話番号 -->
+        <div class="form-group">
+            <label for="phone">電話番号</label>
+            <input type="text" id="phone" placeholder="電話番号を入力">
         </div>
 
         <div class="form-group">
@@ -94,29 +149,63 @@
     </div>
 
     <script>
+        // 郵便番号から住所を取得する関数
+        function fetchAddress() {
+            const postalCode = document.getElementById('postal').value.replace('-', ''); // ハイフンを削除
+            if (postalCode.length === 7) {
+                const url = `https://api.zipaddress.net/?zipcode=${postalCode}`;
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.code === 200 && data.data) {
+                            // 住所をテキストエリアに表示
+                            document.getElementById('address').value = data.data.fullAddress;
+                        } else {
+                            document.getElementById('address').value = '住所が見つかりませんでした。';
+                        }
+                    })
+                    .catch(error => {
+                        document.getElementById('address').value = 'エラーが発生しました。';
+                        console.error(error);
+                    });
+            } else {
+                document.getElementById('address').value = '';
+            }
+        }
+
         function generateText() {
             // 入力された内容を取得
-            const kaimyo = document.getElementById('kaimyo').value;
-            const age = document.getElementById('age').value;
-            const date = document.getElementById('date').value;
-            const zokumei = document.getElementById('zokumei').value;
+            const request = document.getElementById('request').value;
+            const temple = document.getElementById('temple').value;
+            const remarks = document.getElementById('remarks').value;
+            const deadline = document.getElementById('deadline').value;
+            const name = document.getElementById('name').value;
+            const postal = document.getElementById('postal').value;
+            const address = document.getElementById('address').value;
+            const phone = document.getElementById('phone').value;
 
-            // 没年月日を「年」「月」「日」形式に変換
-            let formattedDate = "";
-            if (date) {
-                const dateObj = new Date(date);
+            // 期限を「年」「月」「日」形式に変換
+            let formattedDeadline = "";
+            if (deadline) {
+                const dateObj = new Date(deadline);
                 const year = dateObj.getFullYear();
                 const month = dateObj.getMonth() + 1; // 月は0から始まるので+1
                 const day = dateObj.getDate();
-                formattedDate = `${year}年${month}月${day}日`;
+                formattedDeadline = `${year}年${month}月${day}日`;
             }
 
             // 出力用のテキストを作成
             const outputText = `
-戒名: ${kaimyo}
-没年齢: ${age}
-没年月日: ${formattedDate}
-俗名: ${zokumei}
+依頼内容: ${request}
+寺院名: ${temple}
+特記事項: ${remarks}
+期限: ${formattedDeadline}
+
+申込人情報:
+名前: ${name}
+郵便番号: ${postal}
+住所: ${address}
+電話番号: ${phone}
             `;
 
             // 出力エリアにテキストを表示
